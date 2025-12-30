@@ -35,7 +35,7 @@ def initTables():
       CREATE TABLE IF NOT EXISTS borrows(
         regionalID INTEGER NOT NULL,
         studentID INTEGER NOT NULL,
-        startOfB TIMESTAMP NOT NULL,
+        startOfB DATETIME NOT NULL,
         PRIMARY KEY (regionalID, studentID),
         FOREIGN KEY (regionalID) REFERENCES laptops(regionalID),
         FOREIGN KEY (studentID) REFERENCES users(id)
@@ -48,17 +48,26 @@ def initTables():
          reterner INTEGER REFERENCES users(id),
 		 borworer INTEGER REFERENCES users(id) NOT NULL,
          regionalID INTEGER  REFERENCES laptops(regionalID) NOT NULL,
-         startDate DATE NOT NULL,
-		 endDate DATE NOT NULL CHECK(endDate>startDate)
+         startDate DATETIME NOT NULL,
+		 endDate DATETIME NOT NULL CHECK(endDate>startDate)
       );
     """
   except pymysql.Error as e:
     print(f"SQL Error: {e}")
+
+def addBorow(borower,coumputer,time):
+    try:
+        sql=f"""
+            INSERT into history(borworer,regionalID,startDate) VALUES (
+            '{borower}',{coumputer},{time}
+            )
+        """
     
-def addUser():
+def addUser(id_,password_,name_,mahzor_):
   try:
-    sql = "INSERT into users (id, password, name, mahzor, strikes) VALUES ('"
-    sql += input("Enter id: ") + "', '" + input("Enter password: ") + "', '" + input("Enter full name: ") + "', '" + input("Enter mahzor: ") + "', 0)"
+    sql = F"""INSERT into users (id, password, name, mahzor, strikes) VALUES (
+    '{id_}','{password_}','{name_}','{mahzor_}')
+    """
     cursor.execute(sql)
   except pymysql.Error as e:
      print(f"SQL Error: {e}")
@@ -81,7 +90,11 @@ def showMenu():
       if choice == "1":
         initTables()
       elif choice == "2":
-        addUser()
+        ID=input("id=?")
+        NAME=input("name=?")
+        PASWORD=input("password=?")
+        grade=input("machzor=?")
+        addUser(ID,PASWORD,NAME,grade)
       elif choice == "3":
         cursor.execute("SELECT * FROM users")
         results = cursor.fetchall()
